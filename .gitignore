@@ -1,0 +1,33 @@
+# Python Virtual Environment
+.venv/
+venv/
+ENV/
+
+# Python Cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+
+# Database files
+data/*.db
+data/*.sqlite
+
+# ML Models and metadata (generated dynamically during training)
+ml/models/
+ml/feature_means.json
+ml/zip_price_averages.json
+ml/forecast_results.json
+mlruns/
+
+# Logs and system generated files
+*.log
+.gemini/
+.tempmediaStorage/
+artifacts/
+temp/
+tmp/

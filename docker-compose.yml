@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  # 1. FastAPI Web Application Service
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_TYPE=postgres
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/smarthouse_db
+    volumes:
+      - ./data:/app/data
+      - ./ml:/app/ml
+      - ./mlruns:/app/mlruns
+    depends_on:
+      - db
+    restart: always
+
+  # 2. PostgreSQL 15 Database Service
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=smarthouse_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: always
+
+  # 3. Model registry tracker dashboard (MLflow tracking UI server)
+  mlflow:
+    image: python:3.11-slim
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./data:/app/data
+      - ./mlruns:/app/mlruns
+    command: >
+      sh -c "pip install --no-cache-dir mlflow && 
+             mlflow server --host 0.0.0.0 --port 5000 --backend-store-uri sqlite:////app/data/mlflow.db --default-artifact-root /app/mlruns"
+    restart: always
+
+volumes:
+  pgdata:

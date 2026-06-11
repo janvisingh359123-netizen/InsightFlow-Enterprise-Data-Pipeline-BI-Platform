@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+pandas
+numpy
+scikit-learn
+xgboost
+lightgbm
+mlflow
+joblib
+jinja2
+openpyxl
+matplotlib
+psycopg2-binary
+sqlite3-to-mysql

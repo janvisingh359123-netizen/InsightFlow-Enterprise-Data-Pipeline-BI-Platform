@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartHouse AI – House Price Prediction & Real Estate Intelligence Platform</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Plotly.js -->
+    <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="styles.css?v=1.1">
+</head>
+<body class="dark-theme">
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i data-lucide="home" class="logo-icon"></i>
+                    <span>SmartHouse AI</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-menu">
+                <button class="nav-item active" data-tab="overview">
+                    <i data-lucide="bar-chart-3"></i>
+                    <span>Executive Overview</span>
+                </button>
+                <button class="nav-item" data-tab="predictor">
+                    <i data-lucide="calculator"></i>
+                    <span>Valuation Predictor</span>
+                </button>
+                <button class="nav-item" data-tab="trends">
+                    <i data-lucide="trending-up"></i>
+                    <span>Market Trends</span>
+                </button>
+                <button class="nav-item" data-tab="geographic">
+                    <i data-lucide="map-pin"></i>
+                    <span>Geographic Intel</span>
+                </button>
+                <button class="nav-item" data-tab="investments">
+                    <i data-lucide="gem"></i>
+                    <span>Investments</span>
+                </button>
+                <button class="nav-item" data-tab="mlops">
+                    <i data-lucide="cpu"></i>
+                    <span>Model & MLOps</span>
+                </button>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="db-status">
+                    <div class="status-indicator online"></div>
+                    <span>System Connected</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Workspace -->
+        <main class="main-content">
+            <!-- Top Header -->
+            <header class="top-header">
+                <div class="header-left">
+                    <h1 id="page-title">Executive Overview</h1>
+                    <p class="subtitle" id="page-subtitle">Real estate analytics and key performance drivers</p>
+                </div>
+                
+                <!-- Global Filter Bar -->
+                <div class="header-right filters-container">
+                    <div class="filter-item">
+                        <label for="filter-city">City</label>
+                        <select id="filter-city" class="custom-select">
+                            <option value="All">All Cities</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label for="filter-type">Property Type</label>
+                        <select id="filter-type" class="custom-select">
+                            <option value="All">All Types</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label for="filter-beds">Bedrooms</label>
+                        <select id="filter-beds" class="custom-select">
+                            <option value="All">All Beds</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-secondary" id="btn-export-csv">
+                        <i data-lucide="download"></i>
+                        Export
+                    </button>
+                </div>
+            </header>
+
+            <!-- Dashboard Content Panels -->
+            <div class="workspace-area">
+                
+                <!-- 1. Executive Overview Panel -->
+                <section class="tab-panel active" id="panel-overview">
+                    <!-- KPI Cards Grid -->
+                    <div class="kpi-grid">
+                        <div class="kpi-card">
+                            <div class="kpi-header">
+                                <span>Total Monitored Listings</span>
+                                <i data-lucide="layers" class="kpi-icon text-muted"></i>
+                            </div>
+                            <div class="kpi-value" id="kpi-listings">-</div>
+                            <div class="kpi-footer text-success">
+                                <i data-lucide="arrow-up-right"></i>
+                                <span>100,000+ Record Baseline</span>
+                            </div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-header">
+                                <span>Average Valuation</span>
+                                <i data-lucide="dollar-sign" class="kpi-icon text-muted"></i>
+                            </div>
+                            <div class="kpi-value" id="kpi-avg-price">-</div>
+                            <div class="kpi-footer text-success">
+                                <i data-lucide="trending-up"></i>
+                                <span id="kpi-market-growth">-%</span> YoY Appreciation
+                            </div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-header">
+                                <span>Median Market Valuation</span>
+                                <i data-lucide="scale" class="kpi-icon text-muted"></i>
+                            </div>
+                            <div class="kpi-value" id="kpi-med-price">-</div>
+                            <div class="kpi-footer text-muted">
+                                <span>Midpoint reference valuation</span>
+                            </div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-header">
+                                <span>Avg Price Per Sq Ft</span>
+                                <i data-lucide="maximize-2" class="kpi-icon text-muted"></i>
+                            </div>
+                            <div class="kpi-value" id="kpi-sqft-price">-</div>
+                            <div class="kpi-footer text-success" id="kpi-school">
+                                <i data-lucide="graduation-cap"></i>
+                                <span>School Rating Avg: -</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Executive Overview Layout -->
+                    <div class="grid-2-1">
+                        <!-- Automated Insights Engine -->
+                        <div class="card card-gradient">
+                            <div class="card-header">
+                                <h2>Automated Real Estate Insights</h2>
+                                <span class="badge badge-emerald">AI Generated</span>
+                            </div>
+                            <div class="card-body">
+                                <ul class="insights-list" id="insights-container">
+                                    <li class="skeleton-line"></li>
+                                    <li class="skeleton-line"></li>
+                                    <li class="skeleton-line"></li>
+                                    <li class="skeleton-line"></li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <!-- Core Driver Distribution Chart placeholder -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Valuation Distribution</h2>
+                            </div>
+                            <div class="card-body plot-container" id="overview-dist-chart">
+                                <div class="chart-loading">Loading Plotly Visualization...</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SQL Analytics Console Panel -->
+                    <div class="card margin-top">
+                        <div class="card-header border-bottom">
+                            <div class="header-title-group">
+                                <h2>SQL Analytics Console</h2>
+                                <p class="text-muted">Direct window CTE & ranking functions execution on relational housing records</p>
+                            </div>
+                            <div class="sql-selector-group">
+                                <select id="sql-query-select" class="custom-select select-wide">
+                                    <option value="1">Query 1: City Valuation Benchmarks</option>
+                                    <option value="2">Query 2: Top Appreciating Zip Codes (Dense Rank)</option>
+                                    <option value="3">Query 3: Month-over-Month Market Growth (Lag Window)</option>
+                                    <option value="4">Query 4: Property Type Size & Square Foot Averages</option>
+                                    <option value="5">Query 5: School Ratings & Crime Rate Neighborhood Impact</option>
+                                    <option value="6">Query 6: Underpriced Opportunities Detection (Window Average)</option>
+                                </select>
+                                <button class="btn btn-emerald" id="btn-run-sql">
+                                    <i data-lucide="play"></i>
+                                    Execute
+                                </button>
+                            </div>
+                        </div>
+                        <div class="sql-console-grid">
+                            <div class="sql-code-panel">
+                                <div class="panel-header">SQL QUERY STATEMENT</div>
+                                <pre><code id="sql-code-display">-- Select a query from the dropdown above and click Execute --</code></pre>
+                            </div>
+                            <div class="sql-results-panel">
+                                <div class="panel-header">QUERY RESULTS</div>
+                                <div class="table-container" id="sql-table-container">
+                                    <div class="empty-state">
+                                        <i data-lucide="table"></i>
+                                        <span>Click execute to query the database</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. Valuation Predictor Panel -->
+                <section class="tab-panel" id="panel-predictor">
+                    <div class="grid-form-results">
+                        <!-- Valuation Input Form -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Property Specifications</h2>
+                            </div>
+                            <div class="card-body">
+                                <form id="predictor-form" class="dense-form">
+                                    <div class="form-section-title">Property Details</div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label>Property Type</label>
+                                            <select id="pred-type" class="custom-select" required>
+                                                <option value="Single Family">Single Family</option>
+                                                <option value="Condo">Condo</option>
+                                                <option value="Townhouse">Townhouse</option>
+                                                <option value="Apartment">Apartment</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Area (sq ft)</label>
+                                            <input type="number" id="pred-area" class="custom-input" value="2200" min="400" max="8000" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label>Bedrooms</label>
+                                            <input type="number" id="pred-beds" class="custom-input" value="3" min="1" max="8" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Bathrooms</label>
+                                            <input type="number" id="pred-baths" class="custom-input" value="2.0" step="0.5" min="1" max="6" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label>Floors</label>
+                                            <input type="number" id="pred-floors" class="custom-input" value="1" min="1" max="4" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Garage Spaces</label>
+                                            <input type="number" id="pred-garage" class="custom-input" value="2" min="0" max="4" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label>Year Built</label>
+                                            <input type="number" id="pred-year" class="custom-input" value="2005" min="1950" max="2026" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-section-title">Location & Infrastructure</div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label>City</label>
+                                            <select id="pred-city" class="custom-select" required>
+                                                <option value="Seattle">Seattle, WA</option>
+                                                <option value="Austin">Austin, TX</option>
+                                                <option value="Chicago">Chicago, IL</option>
+                                                <option value="Orlando">Orlando, FL</option>
+                                                <option value="Phoenix">Phoenix, AZ</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Zip Code</label>
+                                            <input type="text" id="pred-zip" class="custom-input" value="98103" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label>School Rating (1-10)</label>
+                                            <input type="number" id="pred-school" class="custom-input" value="7.5" min="1" max="10" step="0.1" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Crime Rate (1-10)</label>
+                                            <input type="number" id="pred-crime" class="custom-input" value="2.5" min="1" max="10" step="0.1" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label>Metro Distance (km)</label>
+                                            <input type="number" id="pred-metro" class="custom-input" value="1.8" min="0.1" max="25" step="0.1" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Center Distance (km)</label>
+                                            <input type="number" id="pred-center" class="custom-input" value="6.5" min="0.1" max="45" step="0.1" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Airport Distance (km)</label>
+                                            <input type="number" id="pred-airport" class="custom-input" value="22.0" min="1" max="80" step="0.1" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label>Nearby Hospitals</label>
+                                            <input type="number" id="pred-hospitals" class="custom-input" value="2" min="0" max="6" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Shopping Centers</label>
+                                            <input type="number" id="pred-shopping" class="custom-input" value="3" min="0" max="10" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-section-title font-small">Amenities</div>
+                                    <div class="amenities-checkbox-grid">
+                                        <label class="checkbox-container">
+                                            <input type="checkbox" id="pred-has-pool" checked>
+                                            <span class="checkmark"></span> Swimming Pool
+                                        </label>
+                                        <label class="checkbox-container">
+                                            <input type="checkbox" id="pred-has-garden" checked>
+                                            <span class="checkmark"></span> Garden
+                                        </label>
+                                        <label class="checkbox-container">
+                                            <input type="checkbox" id="pred-has-balcony">
+                                            <span class="checkmark"></span> Balcony
+                                        </label>
+                                        <label class="checkbox-container">
+                                            <input type="checkbox" id="pred-has-parking" checked>
+                                            <span class="checkmark"></span> Parking Space
+                                        </label>
+                                        <label class="checkbox-container">
+                                            <input type="checkbox" id="pred-has-security" checked>
+                                            <span class="checkmark"></span> 24/7 Security
+                                        </label>
+                                        <label class="checkbox-container">
+                                            <input type="checkbox" id="pred-has-gym">
+                                            <span class="checkmark"></span> In-house Gym
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="form-section-title font-small">Optional comparison info</div>
+                                    <div class="form-group">
+                                        <label>Current List Price ($)</label>
+                                        <input type="number" id="pred-list-price" class="custom-input" placeholder="e.g. 620000">
+                                    </div>
+
+                                    <button type="submit" class="btn btn-emerald btn-full btn-large margin-top">
+                                        <i data-lucide="sparkles"></i>
+                                        Generate Valuation & Explanation
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Valuation Results and Explainable AI -->
+                        <div class="results-layout" id="prediction-results-panel">
+                            <!-- Large Estimate Price Display -->
+                            <div class="card card-highlight">
+                                <div class="card-body prediction-header-block">
+                                    <div class="valuation-title">SMARTHOUSE AI ESTIMATE</div>
+                                    <div class="predicted-price-value" id="val-est-price">$ -</div>
+                                    <div class="pred-confidence">
+                                        <span>Valuation Range: </span>
+                                        <strong id="val-price-range">$ - to $ -</strong>
+                                    </div>
+                                    <div class="meta-pills-row margin-top">
+                                        <div class="meta-pill">
+                                            <i data-lucide="check-circle" class="text-success"></i>
+                                            <span>Confidence Score: <strong id="val-confidence">-%</strong></span>
+                                        </div>
+                                        <div class="meta-pill">
+                                            <i data-lucide="star" class="text-warning"></i>
+                                            <span>Property Grade: <strong id="val-grade">- / 5</strong></span>
+                                        </div>
+                                        <div class="meta-pill">
+                                            <i data-lucide="trending-up" class="text-emerald"></i>
+                                            <span>Deal rating: <strong id="val-deal">Fair</strong></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Local Explainable AI Waterfall/Contribution -->
+                            <div class="card">
+                                <div class="card-header border-bottom">
+                                    <h2>Valuation Factors Breakdown</h2>
+                                    <span class="text-muted text-small">Explainable AI (Approx. Local SHAP Contributions)</span>
+                                </div>
+                                <div class="card-body">
+                                    <div class="explainable-columns-grid">
+                                        <!-- Positive Drivers -->
+                                        <div class="driver-column">
+                                            <div class="driver-column-header text-success">
+                                                <i data-lucide="plus-circle"></i>
+                                                <span>Value Increasers</span>
+                                            </div>
+                                            <ul class="driver-list" id="positive-shap-list">
+                                                <li class="empty-state-list">No prediction generated</li>
+                                            </ul>
+                                        </div>
+                                        <!-- Negative Drivers -->
+                                        <div class="driver-column">
+                                            <div class="driver-column-header text-danger">
+                                                <i data-lucide="minus-circle"></i>
+                                                <span>Value Decreasers</span>
+                                            </div>
+                                            <ul class="driver-list" id="negative-shap-list">
+                                                <li class="empty-state-list">No prediction generated</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Scenario Simulation / What-If Analysis -->
+                            <div class="card">
+                                <div class="card-header border-bottom">
+                                    <h2>Scenario Simulation</h2>
+                                    <p class="text-muted text-small">Interactive What-If analysis of physical renovations and local improvements</p>
+                                </div>
+                                <div class="card-body slider-controls-grid">
+                                    <div class="slider-group">
+                                        <div class="slider-label-val">
+                                            <span>Expand Floor Space</span>
+                                            <span class="slider-badge" id="val-slider-area">+0 sq ft</span>
+                                        </div>
+                                        <input type="range" id="slider-area" class="custom-slider" min="0" max="1500" step="50" value="0">
+                                    </div>
+                                    <div class="slider-group">
+                                        <div class="slider-label-val">
+                                            <span>Improve School Quality</span>
+                                            <span class="slider-badge" id="val-slider-school">+0.0 rating points</span>
+                                        </div>
+                                        <input type="range" id="slider-school" class="custom-slider" min="0" max="3" step="0.1" value="0">
+                                    </div>
+                                    <div class="simulation-checkboxes flex-row margin-top">
+                                        <label class="checkbox-container">
+                                            <input type="checkbox" id="sim-add-pool">
+                                            <span class="checkmark"></span> Add Swimming Pool
+                                        </label>
+                                        <label class="checkbox-container">
+                                            <input type="checkbox" id="sim-add-gym">
+                                            <span class="checkmark"></span> Install Gym
+                                        </label>
+                                        <label class="checkbox-container">
+                                            <input type="checkbox" id="sim-metro-near">
+                                            <span class="checkmark"></span> Station Built Nearby
+                                        </label>
+                                    </div>
+                                    <div class="simulation-output-block card-gradient margin-top">
+                                        <div class="sim-val-row">
+                                            <span>Projected Valuation Change:</span>
+                                            <strong class="text-success text-large" id="sim-price-delta">+$0</strong>
+                                        </div>
+                                        <div class="sim-val-row margin-top-small">
+                                            <span>New Predicted Price:</span>
+                                            <span id="sim-new-price">$0</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 3. Market Trends & Forecasting Panel -->
+                <section class="tab-panel" id="panel-trends">
+                    <div class="grid-1-1">
+                        <!-- Historical Prices Line Graph -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Historical Valuation Trends</h2>
+                                <p class="text-muted">Avg sales transactional price timeline (2022 - 2026)</p>
+                            </div>
+                            <div class="card-body plot-container" id="trends-historical-plot">
+                                <div class="chart-loading">Loading Plotly...</div>
+                            </div>
+                        </div>
+                        
+                        <!-- 12-Month Projections Line Graph -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Appreciative Price Projections</h2>
+                                <p class="text-muted">12-month appreciation projections (FastAPI Autoregressive Forecaster)</p>
+                            </div>
+                            <div class="card-body plot-container" id="trends-forecast-plot">
+                                <div class="chart-loading">Loading Plotly...</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card margin-top">
+                        <div class="card-header">
+                            <h2>Year-over-Year Regional Appreciation Rate</h2>
+                        </div>
+                        <div class="card-body plot-container-short" id="trends-growth-bar">
+                            <div class="chart-loading">Loading Plotly...</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 4. Geographic Intelligence Panel -->
+                <section class="tab-panel" id="panel-geographic">
+                    <div class="card">
+                        <div class="card-header border-bottom">
+                            <h2>Geographic Valuation Map</h2>
+                            <p class="text-muted">Interactive spatial distribution map of average properties pricing profile across ZIP codes</p>
+                        </div>
+                        <div class="card-body plot-container-tall" id="geo-map-plot">
+                            <div class="chart-loading">Loading Interactive Map...</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 5. Investment Opportunities Panel -->
+                <section class="tab-panel" id="panel-investments">
+                    <div class="card">
+                        <div class="card-header border-bottom">
+                            <div class="header-title-group">
+                                <h2>Undervalued Property Deals Analyzer</h2>
+                                <p class="text-muted">Identifies properties with Current Transaction Price lower than SmartHouse AI's model prediction by 5%+</p>
+                            </div>
+                        </div>
+                        <div class="card-body no-padding">
+                            <div class="table-container-large">
+                                <table class="custom-table" id="deals-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Property ID</th>
+                                            <th>City</th>
+                                            <th>Type</th>
+                                            <th>Area (sq ft)</th>
+                                            <th>Bed/Bath</th>
+                                            <th>Market Price</th>
+                                            <th>AI Predicted</th>
+                                            <th>Discount Value</th>
+                                            <th>Discount %</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="deals-table-body">
+                                        <tr>
+                                            <td colspan="10" class="loading-td">Retrieving database opportunities...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 6. Model & MLOps Panel -->
+                <section class="tab-panel" id="panel-mlops">
+                    <div class="grid-2-1">
+                        <!-- Model comparison metrics -->
+                        <div class="card">
+                            <div class="card-header border-bottom">
+                                <h2>Regression Model Comparison Matrix</h2>
+                                <p class="text-muted">Comparison of trained models (logged to MLflow registry)</p>
+                            </div>
+                            <div class="card-body no-padding">
+                                <table class="custom-table" id="ml-models-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Model Pipeline</th>
+                                            <th>MAE</th>
+                                            <th>RMSE</th>
+                                            <th>R² Score</th>
+                                            <th>MAPE %</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="ml-models-body">
+                                        <tr>
+                                            <td colspan="6" class="loading-td">Retrieving MLflow metrics...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <!-- Model drift indicators -->
+                        <div class="card">
+                            <div class="card-header border-bottom">
+                                <h2>Active Model Drift Tracker</h2>
+                                <p class="text-muted">Checks incoming user query distributions against baseline training bounds</p>
+                            </div>
+                            <div class="card-body">
+                                <div class="drift-header-block card-gradient">
+                                    <div class="drift-status-label">Overall PSI Health:</div>
+                                    <div class="drift-status-val text-success" id="drift-overall-status">Stable</div>
+                                    <div class="drift-metrics-summary">Logged predictions analyzed: <span id="drift-logged-count">0</span></div>
+                                </div>
+                                <ul class="drift-list-block" id="drift-features-container">
+                                    <!-- Features details dynamic insertion -->
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid-2-1 margin-top">
+                        <!-- Global SHAP Feature Importances -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Global Feature Importance (SHAP Analysis)</h2>
+                                <p class="text-muted">Mean absolute impact of core features on value models</p>
+                            </div>
+                            <div class="card-body plot-container" id="ml-shap-plot">
+                                <div class="chart-loading">Loading Plotly...</div>
+                            </div>
+                        </div>
+
+                        <!-- Manual MLOps retraining -->
+                        <div class="card card-gradient">
+                            <div class="card-header">
+                                <h2>MLOps Automation Engine</h2>
+                            </div>
+                            <div class="card-body mlops-actions-panel">
+                                <p class="text-muted-dense">The automated retraining pipeline refits all 7 regression pipelines, evaluates the validation set metrics, checks for model drift, and updates registry pointers in the background.</p>
+                                <div class="mlops-triggers margin-top">
+                                    <button class="btn btn-emerald btn-large" id="btn-trigger-retrain">
+                                        <i data-lucide="play-circle"></i>
+                                        Trigger Retraining Pipeline
+                                    </button>
+                                    <div class="retrain-status-text margin-top-small text-muted text-small" id="retrain-status">
+                                        Ready to trigger. Last training baseline: 2026-06-12
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+    
+    <!-- Printable Property Report Modal -->
+    <div id="report-modal" class="modal-backdrop" style="display: none;">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3>Export PDF Valuation Report</h3>
+                <button class="btn-close" id="btn-close-modal"><i data-lucide="x"></i></button>
+            </div>
+            <div class="modal-body printable-report-body" id="modal-report-content">
+                <!-- Report document skeleton will populate on click -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="btn-cancel-report">Cancel</button>
+                <button class="btn btn-emerald" id="btn-print-report">
+                    <i data-lucide="printer"></i> Print / Save as PDF
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Frontend App Scripts -->
+    <script src="app.js?v=1.1"></script>
+</body>
+</html>
